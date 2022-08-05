@@ -1,43 +1,26 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SeleniumProject
+namespace Shiphol
 {
-  /*  class Names
-    {
-        public String pageurl;
-        public String productname; 
-        public String Price;
-        public String Discount;
-        public String Quantity;
-
-
-
-
-    }*/
     class Program
     {
         static void Main(string[] args)
         {
-           
-
-            FileStream s2 = new FileStream(@"C:\Users\SANTHOSH\OneDrive\Product.csv",FileMode.Create);
-            StreamWriter d = new StreamWriter(s2);
+            
             IWebDriver driver = new ChromeDriver();
             driver.Navigate().GoToUrl("https://www.schiphol.nl/en/at-schiphol/shop");
             driver.Manage().Window.Maximize();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            Actions s = new Actions(driver);
+            
             //
             IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
             IWebElement view = driver.FindElement(By.Id("what-tickles-your-fancy?"));
@@ -57,20 +40,19 @@ namespace SeleniumProject
             js.ExecuteScript("arguments[0].click();", drink);
 
 
-           IList<IWebElement> productUrl=driver.FindElements(By.XPath("//div[@class='card__body']/p[@class='card__title']/a"));
-               
+            IList<IWebElement> productUrl = driver.FindElements(By.XPath("//div[@class='card__body']/p[@class='card__title']/a"));
 
 
-            IList <IWebElement> product = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+
+            IList<IWebElement> product = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
 
             IList<IWebElement> prices = driver.FindElements(By.XPath("//p[@class='price-container']"));
 
-            //   IList<IWebElement> discount = driver.FindElements(By.XPath("//del[@class='price price--old']"));
+             IList<IWebElement> Product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
 
-            /* IList<IWebElement> priceess = driver.FindElements(By.XPath("//p[@class='price-container']"));*/
+            IList<IWebElement> price1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
 
-            IWebElement next = driver.FindElement(By.XPath("//a[text()='2']"));
-            js.ExecuteScript("arguments[0].click();", next);
+          
 
 
 
@@ -84,39 +66,71 @@ namespace SeleniumProject
 
             String[] producttext = new String[product.Count];
             String[] pricetext = new String[prices.Count];
-           // String[] discounts = new String[discount.Count];
+            // String[] discounts = new String[discount.Count];
 
 
 
-      
-            
 
-            for(int i =0; i<product.Count; i++)
+
+
+            for (int i = 0; i < product.Count; i++)
             {
-               
-                Console.WriteLine(i + 1+"------------------------Count--------------------------");
+
+                Console.WriteLine(i + 1 + "------------------------Count--------------------------");
                 WebDriverWait count = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 count.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
 
 
                 // IList<IWebElement> Name = product;
+                
                 IList<IWebElement> product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+                
                 WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                Console.WriteLine("Product "+product1[i].Text);
-                String quantity = product1[i].Text;
-                String s1 = volumeExtractor(quantity);
+                String str = product1[i].Text;
+                String[] strr=str.Split();
+                foreach (string word in strr)
+                {
+                    String quantity = string.Empty;
+                    //bool firstNum = Regex.IsMatch(word, "^%d");
+                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
+                        if (endWithl )
+                        {
+                            quantity = word;
+                            Console.WriteLine(quantity);
+                       
+                        
+                        }
+                    Console.WriteLine(word);
+                }
+
+               
 
 
                 // IList<IWebElement> data = prices;
-                IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
-                WebDriverWait price1 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                price1.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                Console.WriteLine("Original"+prices[i].Text);
+              
+                try
+                {
+                    IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
+                    String edit = prices1[i].Text.Replace("Price from:", "").Replace("Current price:", "").Replace("Price:", "").Replace("Discount:", "");
+                    String n =edit.Replace("\r\n€", "");
+                    Console.WriteLine(n);
+                    
+                    WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                    price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($" {e.Message}, {e.StackTrace}");
+                }
+                
+
 
             }
+            IWebElement next = driver.FindElement(By.XPath("//a[text()='2']"));
+            js.ExecuteScript("arguments[0].click();", next);
 
-            for (int j = 0; j < product.Count; j++)
+            for (int j = 0; j < Product1.Count; j++)
             {
 
                 Console.WriteLine(j + 31 + "------------------------Count--------------------------");
@@ -126,17 +140,29 @@ namespace SeleniumProject
 
                 // IList<IWebElement> Name = product;
                 IList<IWebElement> product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+
+                Console.WriteLine("Product " + product1[j].Text);
                 WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                Console.WriteLine("Product " + product1[j].Text);
 
 
                 // IList<IWebElement> data = prices;
-                IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
-                WebDriverWait price1 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                price1.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                Console.WriteLine("Original" + prices[j].Text);
+                try
+                {
+                    IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
+                    String edit = prices1[j].Text.Replace("Price from:", "").Replace("Current price:", "").Replace("Discount:", "").Replace("Price:", "");
+                    String n = edit.Replace("\r\n€", "");
+                    Console.WriteLine(n);
+                    WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                    price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine($"{e.Message}{e.StackTrace}");
+                }
 
+                
+              
             }
 
 
@@ -144,7 +170,7 @@ namespace SeleniumProject
 
         public static string volumeExtractor(String name)
         {
-            
+
             string[] words = name.Split();
             string quantity = string.Empty;
             foreach (string word in words)
@@ -152,7 +178,7 @@ namespace SeleniumProject
                 bool firstNum = Regex.IsMatch(word, "^%d");
                 if (firstNum == true)
                 {
-                    bool endWithl = Regex.IsMatch(word, "L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g");
+                    bool endWithl = Regex.IsMatch(word, "L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
                     if (endWithl)
                     {
                         quantity = word;
@@ -163,5 +189,9 @@ namespace SeleniumProject
             return quantity;
         }
 
+
+
+
     }
 }
+
