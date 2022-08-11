@@ -1,26 +1,28 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Shiphol
+namespace SeleniumProject
 {
+
     class Program
     {
         static void Main(string[] args)
         {
-            
             IWebDriver driver = new ChromeDriver();
             driver.Navigate().GoToUrl("https://www.schiphol.nl/en/at-schiphol/shop");
             driver.Manage().Window.Maximize();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
-            
+
             //
             IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
             IWebElement view = driver.FindElement(By.Id("what-tickles-your-fancy?"));
@@ -48,11 +50,11 @@ namespace Shiphol
 
             IList<IWebElement> prices = driver.FindElements(By.XPath("//p[@class='price-container']"));
 
-             IList<IWebElement> Product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+            IList<IWebElement> Product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
 
             IList<IWebElement> price1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
 
-          
+
 
 
 
@@ -82,48 +84,52 @@ namespace Shiphol
 
 
                 // IList<IWebElement> Name = product;
-                
+
                 IList<IWebElement> product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
-                
+
                 WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
                 String str = product1[i].Text;
-                String[] strr=str.Split();
+                String[] strr = str.Split();
                 foreach (string word in strr)
                 {
                     String quantity = string.Empty;
                     //bool firstNum = Regex.IsMatch(word, "^%d");
-                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
-                        if (endWithl )
-                        {
-                            quantity = word;
-                            Console.WriteLine(quantity);
-                       
-                        
-                        }
+                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
+
+                    if (endWithl)
+                    {
+                        quantity = word;
+                        Console.WriteLine(quantity);
+
+
+                    }
                     Console.WriteLine(word);
                 }
 
-               
-
-
                 // IList<IWebElement> data = prices;
-              
+
                 try
                 {
                     IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
                     String edit = prices1[i].Text.Replace("Price from:", "").Replace("Current price:", "").Replace("Price:", "").Replace("Discount:", "");
-                    String n =edit.Replace("\r\n€", "");
+                    String n = edit.Replace("\r\n€", "");
                     Console.WriteLine(n);
-                    
                     WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                     price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                    String tests = ",";
+                    using (StreamWriter swriter = System.IO.File.CreateText("File.csv"))
+                    {
+                        swriter.WriteLine($"Page URL{tests}Site Domain{tests}Country{tests}Product Name{tests}" +
+                            $"Product Category{tests}Quantity{tests}Product Type{tests}Store Name{tests}Rating{tests}" +
+                            $"Currency(ISO){tests}Promo Flag{tests}edit{tests}Discounted Price{tests}Discount in %{tests}Date");
+                    }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine($" {e.Message}, {e.StackTrace}");
                 }
-                
+
 
 
             }
@@ -139,11 +145,27 @@ namespace Shiphol
 
 
                 // IList<IWebElement> Name = product;
-                IList<IWebElement> product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+                IList<IWebElement> Products1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
 
-                Console.WriteLine("Product " + product1[j].Text);
+               // Console.WriteLine("Product " + product1[j].Text);
                 WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                String str = Product1[j].Text;
+                String[] strr = str.Split();
+                foreach (string word in strr)
+                {
+                    String quantity = string.Empty;
+                    //bool firstNum = Regex.IsMatch(word, "^%d");
+                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
+                    if (endWithl)
+                    {
+                        quantity = word;
+                        Console.WriteLine(quantity);
+
+
+                    }
+                    Console.WriteLine(word);
+                }
 
 
                 // IList<IWebElement> data = prices;
@@ -156,13 +178,13 @@ namespace Shiphol
                     WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                     price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine($"{e.Message}{e.StackTrace}");
                 }
 
-                
-              
+
+
             }
 
 
@@ -188,10 +210,5 @@ namespace Shiphol
             }
             return quantity;
         }
-
-
-
-
     }
 }
-
