@@ -1,6 +1,5 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -11,204 +10,145 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SeleniumProject
+namespace Schiphol
 {
-
     class Program
     {
         static void Main(string[] args)
         {
-            IWebDriver driver = new ChromeDriver();
-            driver.Navigate().GoToUrl("https://www.schiphol.nl/en/at-schiphol/shop");
-            driver.Manage().Window.Maximize();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(30);
+            String filename = @"C:\Schiphol\NewOne.csv";
+            String tests = ",";
+            String Producturl = null;
+            String Product = null;
+            String price1 = null;
+            String from = null;
+            String DisCount = null;
+            String Current = null;
+            String Quantity = null;
+            String pricee = null;
 
-            //
-            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
-            IWebElement view = driver.FindElement(By.Id("what-tickles-your-fancy?"));
-            js.ExecuteScript("arguments[0].scrollIntoView();", view);
-
-            IWebElement Nex = driver.FindElement(By.XPath("(//button[@class='carousel__button'])[2]"));
-            js.ExecuteScript("arguments[0].click();", Nex);
-
-            IWebElement arrow = driver.FindElement(By.XPath("(//a[@class='card__link'])[6]"));
-            js.ExecuteScript("arguments[0].click();", arrow);
-
-
-
-
-            Thread.Sleep(3000);
-            IWebElement drink = driver.FindElement(By.XPath("(//span[@class='categories__target-text'])[2]"));
-            js.ExecuteScript("arguments[0].click();", drink);
-
-
-            IList<IWebElement> productUrl = driver.FindElements(By.XPath("//div[@class='card__body']/p[@class='card__title']/a"));
-
-
-
-            IList<IWebElement> product = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
-
-            IList<IWebElement> prices = driver.FindElements(By.XPath("//p[@class='price-container']"));
-
-            IList<IWebElement> Product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
-
-            IList<IWebElement> price1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
-
-
-
-
-
-
-
-
-
-
-
-
-
-            String[] producttext = new String[product.Count];
-            String[] pricetext = new String[prices.Count];
-            // String[] discounts = new String[discount.Count];
-
-
-
-
-
-
-            for (int i = 0; i < product.Count; i++)
+            using (StreamWriter write = System.IO.File.CreateText(filename))
             {
-
-                Console.WriteLine(i + 1 + "------------------------Count--------------------------");
-                WebDriverWait count = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                count.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                write.WriteLine($"PageURL{tests}ProductName{tests}Quantity{tests}Price{tests}Discount{tests}CurrentPrice{tests}");
 
 
-                // IList<IWebElement> Name = product;
+                IWebDriver driver = new ChromeDriver();
+                driver.Navigate().GoToUrl("https://www.schiphol.nl/en/at-schiphol/shop");
+                driver.Manage().Window.Maximize();
+                driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(120);
 
-                IList<IWebElement> product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
+                //
+                IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+                IWebElement view = driver.FindElement(By.Id("what-tickles-your-fancy?"));
+                js.ExecuteScript("arguments[0].scrollIntoView();", view);
 
-                WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                String str = product1[i].Text;
-                String[] strr = str.Split();
-                foreach (string word in strr)
+                IWebElement Nex = driver.FindElement(By.XPath("(//button[@class='carousel__button'])[2]"));
+                js.ExecuteScript("arguments[0].click();", Nex);
+
+                IWebElement arrow = driver.FindElement(By.XPath("(//a[@class='card__link'])[6]"));
+                js.ExecuteScript("arguments[0].click();", arrow);
+
+                //IList<IWebElement> Product1 = driver.FindElements(By.XPath("//span[@class='card__title-text']")).ToList();
+
+                //IList<IWebElement> price1 = driver.FindElements(By.XPath("//p[@class='price-container']")).ToList();
+
+                //String[] producttext = new String[product.Count];
+                //    String[] pricetext = new String[prices.Count];
+
+
+
+
+                for (int i = 0; i <= 1; i++)
+
                 {
-                    String quantity = string.Empty;
-                    //bool firstNum = Regex.IsMatch(word, "^%d");
-                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
+                    Thread.Sleep(3000);
+                    IWebElement drink = driver.FindElement(By.XPath("(//span[@class='categories__target-text'])[2]"));
+                    js.ExecuteScript("arguments[0].click();", drink);
 
-                    if (endWithl)
+
+                    IList<IWebElement> productUrl = driver.FindElements(By.XPath("//div[@class='card__body']/p[@class='card__title']/a")).ToList();
+
+                    IList<IWebElement> product = driver.FindElements(By.XPath("//span[@class='card__title-text']")).ToList();
+
+                    IList<IWebElement> prices = driver.FindElements(By.XPath("//p[@class='price-container']")).ToList();
+                    IWebElement next = driver.FindElement(By.XPath("//a[text()='2']"));
+                    js.ExecuteScript("arguments[0].click();", next);
+
+
+
+                    List<string> quant = new List<string>();
+                    for (int j = 0; j < product.Count; j++)
                     {
-                        quantity = word;
-                        Console.WriteLine(quantity);
+                        Console.WriteLine(j + 1);
+                        IList<IWebElement> productUrl1 = driver.FindElements(By.XPath("//div[@class='card__body']/p[@class='card__title']/a")).ToList();
+                        Producturl = productUrl1[j].GetAttribute("href");
+                        WebDriverWait three = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                        three.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                        Console.WriteLine(Producturl);
+
+
+
+                        IList<IWebElement> product2 = driver.FindElements(By.XPath("//span[@class='card__title-text']")).ToList();
+                        Product = product2[j].Text.Replace(",", "");
+                        WebDriverWait one = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                        one.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                        // Console.WriteLine(Product);
+
+
+                        IList<IWebElement> prices12 = driver.FindElements(By.XPath("//p[@class='price-container']")).ToList();
+                        price1 = prices12[j].Text;
+                        WebDriverWait two = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                        two.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+                        //   Console.WriteLine(price);
+
+                        quant.Add(Product);
+
+
+
+
+                        String[] quantity = Product.Split(new String[] { }, StringSplitOptions.None);
+                        for (int l = 0; l < quantity.Count(); l++)
+                        {
+                            String quan = quantity[l];
+                            bool containsInt = quan.Any(char.IsDigit);
+                            //bool endWithl = Regex.IsMatch(quantity[l], "^%d|L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
+                            if (containsInt == true)
+                            {
+                                if (quan.Contains("cL") || quan.Contains("CL") || quan.Contains("L") || quan.Contains("cl") || quan.Contains("g"))
+                                {
+                                    Quantity = quan;
+                                    Console.WriteLine(quan);
+                                }
+                            }
+
+                        }
+                        //€
+                        IList<IWebElement> pricess1 = driver.FindElements(By.XPath("//p[@class='price-container']")).ToList();
+                        String pricevalue = pricess1[j].Text;
+                        WebDriverWait four = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                        four.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
+
+                        String[] prices3 = pricevalue.Split(new String[] { }, StringSplitOptions.None);
+                        from = prices3[0].Replace("Price", "");
+                        from= prices3[0].Replace("from:", "");
+                        Current = prices3[1].Replace("Current price:", "");
+                        DisCount = prices3[2].Replace("Discount:", "");
+                        Console.WriteLine(Current);
+
+
+                        Console.WriteLine(DisCount);
+                        Console.WriteLine(from);
+                        
+
+                        write.WriteLine($"{Producturl}{tests}{ Product}{tests} {Quantity}{tests}{pricee}{tests}{Current}{tests}{DisCount}{tests}{from}");
 
 
                     }
-                    Console.WriteLine(word);
-                }
-
-                // IList<IWebElement> data = prices;
-
-                try
-                {
-                    IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
-                    String edit = prices1[i].Text.Replace("Price from:", "").Replace("Current price:", "").Replace("Price:", "").Replace("Discount:", "");
-                    String n = edit.Replace("\r\n€", "");
-                    Console.WriteLine(n);
-                    WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                    price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                    String tests = ",";
-                    using (StreamWriter swriter = System.IO.File.CreateText("File.csv"))
-                    {
-                        swriter.WriteLine($"Page URL{tests}Site Domain{tests}Country{tests}Product Name{tests}" +
-                            $"Product Category{tests}Quantity{tests}Product Type{tests}Store Name{tests}Rating{tests}" +
-                            $"Currency(ISO){tests}Promo Flag{tests}edit{tests}Discounted Price{tests}Discount in %{tests}Date");
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($" {e.Message}, {e.StackTrace}");
-                }
 
 
 
-            }
-            IWebElement next = driver.FindElement(By.XPath("//a[text()='2']"));
-            js.ExecuteScript("arguments[0].click();", next);
-
-            for (int j = 0; j < Product1.Count; j++)
-            {
-
-                Console.WriteLine(j + 31 + "------------------------Count--------------------------");
-                WebDriverWait count = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                count.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-
-
-                // IList<IWebElement> Name = product;
-                IList<IWebElement> Products1 = driver.FindElements(By.XPath("//span[@class='card__title-text']"));
-
-               // Console.WriteLine("Product " + product1[j].Text);
-                WebDriverWait products = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                products.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                String str = Product1[j].Text;
-                String[] strr = str.Split();
-                foreach (string word in strr)
-                {
-                    String quantity = string.Empty;
-                    //bool firstNum = Regex.IsMatch(word, "^%d");
-                    bool endWithl = Regex.IsMatch(word, "^%d|L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
-                    if (endWithl)
-                    {
-                        quantity = word;
-                        Console.WriteLine(quantity);
-
-
-                    }
-                    Console.WriteLine(word);
-                }
-
-
-                // IList<IWebElement> data = prices;
-                try
-                {
-                    IList<IWebElement> prices1 = driver.FindElements(By.XPath("//p[@class='price-container']"));
-                    String edit = prices1[j].Text.Replace("Price from:", "").Replace("Current price:", "").Replace("Discount:", "").Replace("Price:", "");
-                    String n = edit.Replace("\r\n€", "");
-                    Console.WriteLine(n);
-                    WebDriverWait price12 = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                    price12.IgnoreExceptionTypes(typeof(StaleElementReferenceException));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"{e.Message}{e.StackTrace}");
-                }
-
-
-
-            }
-
-
-        }
-
-        public static string volumeExtractor(String name)
-        {
-
-            string[] words = name.Split();
-            string quantity = string.Empty;
-            foreach (string word in words)
-            {
-                bool firstNum = Regex.IsMatch(word, "^%d");
-                if (firstNum == true)
-                {
-                    bool endWithl = Regex.IsMatch(word, "L$|CL$|ML$|l$|cl$|ml$|Ml$|Cl$|mL$|ML$|g$");
-                    if (endWithl)
-                    {
-                        quantity = word;
-                        return quantity;
-                    }
                 }
             }
-            return quantity;
         }
     }
 }
